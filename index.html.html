@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <!-- 手機響應式設定 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>報名成功個案查詢系統</title>
+  <style>
+    body {
+      font-family: "Microsoft JhengHei", Arial, sans-serif;
+      background-color: #f0f2f5;
+      text-align: center;
+      padding: 20px;
+    }
+    h2 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+    .input-box {
+      margin-bottom: 20px;
+    }
+    input {
+      padding: 10px;
+      width: 70%;
+      max-width: 220px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      margin-top: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .result-box {
+      margin-top: 20px;
+      background-color: #fff;
+      padding: 20px;
+      width: 95%;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .result-title {
+      font-weight: bold;
+      margin-bottom: 15px;
+      font-size: 18px;
+      color: #34495e;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 8px;
+    }
+    .result-item {
+      margin: 10px 0;
+      font-size: 16px;
+      padding: 8px;
+      border-radius: 6px;
+    }
+    .clinic { background-color: #eafaf1; color: #27ae60; }
+    .count { background-color: #fff3e0; color: #e67e22; }
+    .city { background-color: #eaf2fb; color: #2980b9; }
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #f4f6f7;
+      color: #7f8c8d;
+      padding: 8px;
+      border-radius: 6px;
+      flex-wrap: wrap; /* 手機上自動換行 */
+    }
+    .highlight-today { color: red; font-weight: bold; }
+    .highlight-total { color: blue; font-weight: bold; }
+    .update-time {
+      font-size: 14px;
+      color: #555;
+      margin-left: 10px;
+    }
+    /* 手機字體縮小 */
+    @media (max-width: 480px) {
+      body { font-size: 14px; }
+      .result-item { font-size: 14px; }
+      h2 { font-size: 18px; }
+      button { width: 80%; margin-top: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <h2>【醫療院所報名成功個案數】查詢系統</h2>
+  <div class="input-box">
+    <label>請輸入醫事機構代碼：</label><br>
+    <input type="text" id="codeInput">
+    <button onclick="searchClinic()">查詢</button>
+  </div>
+
+  <div id="result" class="result-box" style="display:none;">
+    <div class="result-title">查詢結果</div>
+    <div id="clinicName" class="result-item clinic"></div>
+    <div id="count" class="result-item count"></div>
+    <div id="city" class="result-item city"></div>
+    <div class="stats-row">
+      <div id="stats"></div>
+      <div class="update-time">資料更新至 7/24 上午 11:45</div>
+    </div>
+  </div>
+
+  <script>
+    function searchClinic() {
+      var code = document.getElementById("codeInput").value;
+      var url = "https://script.google.com/macros/s/AKfycbwU9hqsF-ENRlRd9SrTrJBAYl6GsyCHNthvLjew3CtqU2G8ltE-gStCzUqUIaulHsvd/exec?code=" + code;
+
+      fetch(url)
+        .then(response => response.text())
+        .then(data => {
+          var lines = data.split("\n");
+          document.getElementById("clinicName").innerText = lines[1] || "";
+          document.getElementById("count").innerText = lines[2] || "";
+          document.getElementById("city").innerText = lines[3] || "";
+
+          if (lines[4]) {
+            var stats = lines[4].replace(/今日 (\d+)/, "<span class='highlight-today'>今日 $1</span>")
+                                .replace(/累計 (\d+)/, "<span class='highlight-total'>累計 $1</span>");
+            document.getElementById("stats").innerHTML = stats;
+          }
+
+          document.getElementById("result").style.display = "block";
+        })
+        .catch(error => {
+          alert("查詢失敗，請檢查代碼或伺服器設定");
+          console.error(error);
+        });
+    }
+  </script>
+</body>
+</html>
